@@ -288,6 +288,49 @@ h5 {
   background-color: #F8F9FA;
 }
 
+/* Стили для таблицы предобработанных данных */
+#preprocessedResults {
+  overflow-x: auto;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+#preprocessedResults table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  font-size: 14px;
+  border: 1px solid var(--border-color);
+}
+
+#preprocessedResults th,
+#preprocessedResults td {
+  border: 1px solid var(--border-color);
+  padding: 12px 16px;
+  text-align: left;
+}
+
+#preprocessedResults th {
+  background-color: #F1F3F4;
+  color: var(--text-secondary);
+  font-weight: 500;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+#preprocessedResults tr {
+  transition: var(--transition);
+}
+
+#preprocessedResults tr.table-success {
+  background-color: var(--accent-light);
+}
+
+#preprocessedResults tr:hover {
+  background-color: #F8F9FA;
+}
+
 /* Сообщения */
 #messages {
   position: fixed;
@@ -483,4 +526,143 @@ h5 {
   background-color: #F1F3F4;
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
+}
+
+/* Стили для списка признаков в Isolation Forest */
+.features-list {
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.feature-checkbox {
+  margin-bottom: 0.25rem !important;
+}
+
+.feature-checkbox label {
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* Оформление вкладок */
+#featuresTabs .nav-link {
+  font-size: 0.85rem;
+  padding: 0.4rem 0.8rem;
+}
+
+/* Стили для скроллбара в списке признаков */
+.features-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.features-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.features-list::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.features-list::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Стили для карточек параметров */
+#isolationForestOptions .card-header {
+  padding: 0.5rem 1rem;
+}
+
+#isolationForestOptions .card-body {
+  padding: 0.75rem 1rem;
+}
+
+/* Стили для матрицы выбора признаков */
+.feature-matrix-container {
+  max-height: 250px;
+  overflow-y: auto;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.feature-matrix {
+  margin-bottom: 0;
+}
+
+.feature-matrix thead th {
+  position: sticky;
+  top: 0;
+  background-color: #f8f9fa;
+  z-index: 1;
+}
+
+.feature-matrix th,
+.feature-matrix td {
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  vertical-align: middle;
+}
+
+.feature-matrix th:first-child,
+.feature-matrix td:first-child {
+  width: 70%;
+}
+
+.feature-matrix th:not(:first-child),
+.feature-matrix td:not(:first-child) {
+  width: 15%;
+  text-align: center;
+}
+
+.feature-matrix .form-check {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.feature-matrix .form-check-input {
+  margin: 0;
+}
+
+/* Стили для поиска признаков */
+.feature-filter .form-control {
+  height: 32px;
+  font-size: 0.85rem;
+}
+
+.feature-filter .input-group-text {
+  padding: 0.25rem 0.5rem;
+}
+
+.feature-filter .material-icons {
+  font-size: 18px;
+}
+
+/* Стили для кнопок выбора признаков */
+.feature-actions .btn {
+  font-size: 0.85rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.feature-actions .material-icons {
+  font-size: 16px;
+  vertical-align: text-bottom;
+}
+
+/* Стили для инфо-блока */
+.feature-info .alert {
+  padding: 0.5rem;
+  margin-bottom: 0;
+}
+
+.feature-info .material-icons {
+  vertical-align: text-bottom;
+}
+
+/* Стили для фильтрации признаков */
+.feature-filtered-out {
+  display: none;
 }

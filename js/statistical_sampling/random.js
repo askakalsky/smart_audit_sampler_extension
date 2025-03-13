@@ -114,18 +114,3 @@ if (typeof window !== 'undefined') {
     }
   };
 }
-
-// Пример использования:
-/*
-const data = [
-  { id: 1, name: 'A', value: 10 },
-  { id: 2, name: 'B', value: 20 },
-  { id: 3, name: 'C', value: 30 },
-  { id: 4, name: 'D', value: 40 },
-  { id: 5, name: 'E', value: 50 }
-];
-
-const result = randomSampling(data, 2, 42);
-console.log(result.methodDescription);
-console.log('Sample:', result.sample);
-*/

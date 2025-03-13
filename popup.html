@@ -12,255 +12,430 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="css/styles.css">
     <!-- Загружаем библиотеку XLSX до основных скриптов -->
-    <script src="js/xlsx.full.min.js"></script>
+    <script src="js/libs/xlsx.full.min.js"></script>
+    <!-- Загружаем утилиты для препроцессинга данных -->
+    <script src="js/utils/preprocessing.js"></script>
 </head>
 
 <body>
     <div class="container-fluid my-4">
-        <div class="d-flex align-items-center justify-content-center mb-4">
-            <img src="images/icon48.png" alt="Statistical Sampler Logo" class="me-3" width="48" height="48">
-            <h1 class="mb-0">Statistical Sampler</h1>
-        </div>
-
-        <div class="row">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings"
+                    type="button" role="tab">Настройки</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="results-tab" data-bs-toggle="tab" data-bs-target="#results" type="button"
+                    role="tab">Результаты</button>
+            </li>
+            <li class="nav-item" role="presentation" id="details-tab-container" style="display: none;">
+                <button class="nav-link" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button"
+                    role="tab">Подробности</button>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
             <!-- Левая колонка: Загрузка и параметры -->
-            <div class="col-lg-4">
-                <!-- Загрузка данных -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <span class="material-icons me-2">upload_file</span>
-                        <h5 class="mb-0">Загрузка данных</h5>
+            <div class="tab-pane fade show active" id="settings" role="tabpanel">
+                <div class="col-lg-8 mx-auto">
+                    <!-- Загрузка данных -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <span class="material-icons me-2">upload_file</span>
+                            <h5 class="mb-0">Загрузка данных</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="file-upload-container mb-3">
+                                <label for="fileInput" class="form-label">Выберите Excel или CSV файл:</label>
+                                <div class="input-group">
+                                    <input type="file" class="form-control" id="fileInput" accept=".xlsx,.xls,.csv">
+                                    <span class="upload-icon material-icons">file_upload</span>
+                                </div>
+                            </div>
+                            <div class="data-info mb-3" id="dataInfo"></div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="file-upload-container mb-3">
-                            <label for="fileInput" class="form-label">Выберите Excel или CSV файл:</label>
-                            <div class="input-group">
-                                <input type="file" class="form-control" id="fileInput" accept=".xlsx,.xls,.csv">
-                                <span class="upload-icon material-icons">file_upload</span>
-                            </div>
+
+                    <!-- Параметры выборки -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <span class="material-icons me-2">settings</span>
+                            <h5 class="mb-0">Параметры выборки</h5>
                         </div>
-                        <div class="data-info mb-3" id="dataInfo"></div>
-                    </div>
-                </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="sampleMethodSelect" class="form-label">Метод отбора:</label>
+                                <select class="form-select" id="sampleMethodSelect">
+                                    <option value="random">Случайный отбор</option>
+                                    <option value="systematic">Систематический отбор</option>
+                                    <option value="stratified">Стратифицированный отбор</option>
+                                    <option value="mus">Монетарный отбор (MUS)</option>
+                                    <option value="isolationForest">Выявление аномалий (Isolation Forest)</option>
+                                </select>
+                            </div>
 
-                <!-- Параметры выборки -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <span class="material-icons me-2">settings</span>
-                        <h5 class="mb-0">Параметры выборки</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label for="sampleMethodSelect" class="form-label">Метод отбора:</label>
-                            <select class="form-select" id="sampleMethodSelect">
-                                <option value="random">Случайный отбор</option>
-                                <option value="systematic">Систематический отбор</option>
-                                <option value="stratified">Стратифицированный отбор</option>
-                                <option value="mus">Монетарный отбор (MUS)</option>
-                            </select>
-                        </div>
+                            <div class="method-options mb-3" id="randomOptions">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">
+                                        <span class="material-icons">shuffle</span>
+                                    </span>
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="randomSampleSize" min="1"
+                                            value="30">
+                                        <label for="randomSampleSize">Размер выборки</label>
+                                    </div>
+                                </div>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">
+                                        <span class="material-icons">auto_fix_high</span>
+                                    </span>
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="randomSeed" value="42">
+                                        <label for="randomSeed">Зерно (seed)</label>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <div class="method-options mb-3" id="randomOptions">
-                            <div class="input-group mb-3">
-                                <span class="input-group-text">
-                                    <span class="material-icons">shuffle</span>
-                                </span>
-                                <div class="form-floating">
-                                    <input type="number" class="form-control" id="randomSampleSize" min="1" value="30">
-                                    <label for="randomSampleSize">Размер выборки</label>
+                            <div class="method-options mb-3" id="systematicOptions" style="display:none;">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">
+                                        <span class="material-icons">format_list_numbered</span>
+                                    </span>
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="systematicSampleSize" min="1"
+                                            value="30">
+                                        <label for="systematicSampleSize">Размер выборки</label>
+                                    </div>
+                                </div>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">
+                                        <span class="material-icons">play_circle</span>
+                                    </span>
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="systematicStartPoint" min="0"
+                                            value="0">
+                                        <label for="systematicStartPoint">Начальная точка</label>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="input-group mb-3">
-                                <span class="input-group-text">
-                                    <span class="material-icons">auto_fix_high</span>
-                                </span>
-                                <div class="form-floating">
-                                    <input type="number" class="form-control" id="randomSeed" value="42">
-                                    <label for="randomSeed">Зерно (seed)</label>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="method-options mb-3" id="systematicOptions" style="display:none;">
-                            <div class="input-group mb-3">
-                                <span class="input-group-text">
-                                    <span class="material-icons">format_list_numbered</span>
-                                </span>
-                                <div class="form-floating">
-                                    <input type="number" class="form-control" id="systematicSampleSize" min="1"
-                                        value="30">
-                                    <label for="systematicSampleSize">Размер выборки</label>
+                            <div class="method-options mb-3" id="stratifiedOptions" style="display:none;">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">
+                                        <span class="material-icons">layers</span>
+                                    </span>
+                                    <div class="form-floating">
+                                        <select class="form-select" id="stratifiedColumn"></select>
+                                        <label for="stratifiedColumn">Колонка для стратификации</label>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="input-group mb-3">
-                                <span class="input-group-text">
-                                    <span class="material-icons">play_circle</span>
-                                </span>
-                                <div class="form-floating">
-                                    <input type="number" class="form-control" id="systematicStartPoint" min="0"
-                                        value="0">
-                                    <label for="systematicStartPoint">Начальная точка</label>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">
+                                        <span class="material-icons">data_usage</span>
+                                    </span>
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="stratifiedSampleSize" min="1"
+                                            value="30">
+                                        <label for="stratifiedSampleSize">Общий размер выборки</label>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="method-options mb-3" id="stratifiedOptions" style="display:none;">
-                            <div class="input-group mb-3">
-                                <span class="input-group-text">
-                                    <span class="material-icons">layers</span>
-                                </span>
-                                <div class="form-floating">
-                                    <select class="form-select" id="stratifiedColumn"></select>
-                                    <label for="stratifiedColumn">Колонка для стратификации</label>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">
+                                        <span class="material-icons">auto_fix_high</span>
+                                    </span>
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="stratifiedSeed" value="42">
+                                        <label for="stratifiedSeed">Зерно (seed)</label>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="input-group mb-3">
-                                <span class="input-group-text">
-                                    <span class="material-icons">data_usage</span>
-                                </span>
-                                <div class="form-floating">
-                                    <input type="number" class="form-control" id="stratifiedSampleSize" min="1"
-                                        value="30">
-                                    <label for="stratifiedSampleSize">Общий размер выборки</label>
-                                </div>
-                            </div>
-                            <div class="input-group mb-3">
-                                <span class="input-group-text">
-                                    <span class="material-icons">auto_fix_high</span>
-                                </span>
-                                <div class="form-floating">
-                                    <input type="number" class="form-control" id="stratifiedSeed" value="42">
-                                    <label for="stratifiedSeed">Зерно (seed)</label>
-                                </div>
-                            </div>
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="stratifiedProportional" checked>
-                                <label class="form-check-label" for="stratifiedProportional">
-                                    Пропорциональное распределение
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="method-options mb-3" id="musOptions" style="display:none;">
-                            <div class="input-group mb-3">
-                                <span class="input-group-text">
-                                    <span class="material-icons">attach_money</span>
-                                </span>
-                                <div class="form-floating">
-                                    <select class="form-select" id="musValueColumn"></select>
-                                    <label for="musValueColumn">Колонка со значениями</label>
-                                </div>
-                            </div>
-                            <div class="input-group mb-3">
-                                <span class="input-group-text">
-                                    <span class="material-icons">layers</span>
-                                </span>
-                                <div class="form-floating">
-                                    <select class="form-select" id="musStrataColumn"></select>
-                                    <label for="musStrataColumn">Колонка для стратификации (опционально)</label>
-                                </div>
-                            </div>
-                            <div class="input-group mb-3">
-                                <span class="input-group-text">
-                                    <span class="material-icons">data_usage</span>
-                                </span>
-                                <div class="form-floating">
-                                    <input type="number" class="form-control" id="musSampleSize" min="1" value="30">
-                                    <label for="musSampleSize">Размер выборки</label>
-                                </div>
-                            </div>
-                            <div class="input-group mb-3">
-                                <span class="input-group-text">
-                                    <span class="material-icons">auto_fix_high</span>
-                                </span>
-                                <div class="form-floating">
-                                    <input type="number" class="form-control" id="musSeed" value="42">
-                                    <label for="musSeed">Зерно (seed)</label>
-                                </div>
-                            </div>
-                            <div class="input-group mb-3">
-                                <span class="input-group-text">
-                                    <span class="material-icons">filter_alt</span>
-                                </span>
-                                <div class="form-floating">
-                                    <input type="number" class="form-control" id="musThreshold" value="0" step="0.01">
-                                    <label for="musThreshold">Пороговое значение (threshold)</label>
-                                </div>
-                            </div>
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="musIgnoreZeroValues" checked>
-                                <label class="form-check-label" for="musIgnoreZeroValues">
-                                    Игнорировать нулевые и отрицательные значения
-                                </label>
-                            </div>
-                        </div>
-
-                        <button class="btn btn-primary w-100" id="generateSampleBtn" disabled>
-                            <span class="material-icons me-2">science</span>
-                            Сформировать выборку
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Экспорт данных -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <span class="material-icons me-2">download</span>
-                        <h5 class="mb-0">Экспорт данных</h5>
-                    </div>
-                    <div class="card-body">
-                        <!-- Область для выбора типа экспорта -->
-                        <div class="export-options mb-3">
-                            <label class="form-label">Тип экспорта:</label>
-                            <div class="d-flex mb-3 export-type-selector">
-                                <div class="form-check me-4">
-                                    <input class="form-check-input" type="radio" name="exportType" id="exportSample"
-                                        value="sample" checked>
-                                    <label class="form-check-label" for="exportSample">
-                                        Только выборка
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="exportType" id="exportAll"
-                                        value="all">
-                                    <label class="form-check-label" for="exportAll">
-                                        Полная популяция с метками
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="stratifiedProportional" checked>
+                                    <label class="form-check-label" for="stratifiedProportional">
+                                        Пропорциональное распределение
                                     </label>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Кнопки для экспорта -->
-                        <div class="d-flex gap-3" id="exportButtons">
-                            <button class="btn btn-success flex-grow-1" id="exportCsvBtn" disabled>
-                                <span class="material-icons me-2">insert_drive_file</span>
-                                CSV
+                            <div class="method-options mb-3" id="musOptions" style="display:none;">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">
+                                        <span class="material-icons">attach_money</span>
+                                    </span>
+                                    <div class="form-floating">
+                                        <select class="form-select" id="musValueColumn"></select>
+                                        <label for="musValueColumn">Колонка со значениями</label>
+                                    </div>
+                                </div>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">
+                                        <span class="material-icons">layers</span>
+                                    </span>
+                                    <div class="form-floating">
+                                        <select class="form-select" id="musStrataColumn"></select>
+                                        <label for="musStrataColumn">Колонка для стратификации (опционально)</label>
+                                    </div>
+                                </div>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">
+                                        <span class="material-icons">data_usage</span>
+                                    </span>
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="musSampleSize" min="1" value="30">
+                                        <label for="musSampleSize">Размер выборки</label>
+                                    </div>
+                                </div>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">
+                                        <span class="material-icons">auto_fix_high</span>
+                                    </span>
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="musSeed" value="42">
+                                        <label for="musSeed">Зерно (seed)</label>
+                                    </div>
+                                </div>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text">
+                                        <span class="material-icons">filter_alt</span>
+                                    </span>
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" id="musThreshold" value="0"
+                                            step="0.01">
+                                        <label for="musThreshold">Пороговое значение (threshold)</label>
+                                    </div>
+                                </div>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="musIgnoreZeroValues" checked>
+                                    <label class="form-check-label" for="musIgnoreZeroValues">
+                                        Игнорировать нулевые и отрицательные значения
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Опции для изоляционного леса -->
+                            <div class="method-options mb-3" id="isolationForestOptions" style="display:none;">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">Параметры выявления аномалий</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Переключатель режима выборки -->
+                                        <div class="form-check form-switch mb-3">
+                                            <input class="form-check-input" type="checkbox" id="useTopNMode" checked>
+                                            <label class="form-check-label" for="useTopNMode">
+                                                Указать размер выборки (топ-N аномалий)
+                                            </label>
+                                        </div>
+
+                                        <!-- Размер выборки (Топ-N аномалий) -->
+                                        <div class="input-group mb-3" id="topNContainer">
+                                            <span class="input-group-text">
+                                                <span class="material-icons">filter_list</span>
+                                            </span>
+                                            <div class="form-floating">
+                                                <input type="number" class="form-control" id="topNSize" min="1"
+                                                    value="30">
+                                                <label for="topNSize">Количество аномалий для выборки</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Ожидаемая доля аномалий (contamination) -->
+                                        <div class="input-group mb-3" id="contaminationContainer" style="display:none;">
+                                            <span class="input-group-text">
+                                                <span class="material-icons">percent</span>
+                                            </span>
+                                            <div class="form-floating">
+                                                <input type="number" class="form-control" id="contamination" min="0.01"
+                                                    max="0.5" step="0.01" value="0.1">
+                                                <label for="contamination">Ожидаемая доля аномалий (0.01-0.5)</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="info-block mt-2">
+                                            <div class="alert alert-info small py-2 px-3">
+                                                Алгоритм автоматически определяет оптимальное количество деревьев и
+                                                пороговое значение аномалий,
+                                                аналогично реализации в scikit-learn.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Выбор признаков -->
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">Выбор признаков для анализа</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="features-matrix">
+                                            <!-- Объяснение выбора признаков -->
+                                            <div class="feature-info mb-3">
+                                                <div class="alert alert-info small py-2 px-3">
+                                                    <span>
+                                                        Выберите признаки для анализа. Один признак может быть
+                                                        одновременно
+                                                        числовым и категориальным.
+                                                        Категориальные признаки будут автоматически преобразованы в
+                                                        числовой
+                                                        формат.
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Фильтр для быстрого поиска признаков -->
+                                            <div class="feature-filter mb-3">
+                                                <div class="input-group input-group-sm">
+                                                    <span class="input-group-text">
+                                                        <span class="material-icons small">search</span>
+                                                    </span>
+                                                    <input type="text" class="form-control" id="featureFilter"
+                                                        placeholder="Поиск признаков...">
+                                                </div>
+                                            </div>
+
+                                            <!-- Матрица выбора признаков -->
+                                            <div class="feature-matrix-container">
+                                                <table class="table table-sm table-hover feature-matrix">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Признак</th>
+                                                            <th class="text-center">
+                                                                <span class="material-icons small"
+                                                                    title="Числовой">123</span>
+                                                            </th>
+                                                            <th class="text-center">
+                                                                <span class="material-icons small"
+                                                                    title="Категориальный">category</span>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="featuresTableBody">
+                                                        <!-- Здесь будут динамически созданные строки для признаков -->
+                                                        <tr>
+                                                            <td colspan="3" class="text-center text-muted">
+                                                                Загрузите данные для отображения списка признаков
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                            <!-- Кнопки для быстрого выбора признаков -->
+                                            <div class="feature-actions d-flex justify-content-between mt-3">
+                                                <div>
+                                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                                        id="selectAllNumerical">
+                                                        <span class="material-icons small me-1">123</span> Выбрать все
+                                                        числовые
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-primary ms-2"
+                                                        id="selectAllCategorical">
+                                                        <span class="material-icons small me-1">category</span> Выбрать
+                                                        все
+                                                        категориальные
+                                                    </button>
+                                                </div>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                    id="resetFeatureSelection">
+                                                    Сбросить выбор
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-primary w-100" id="generateSampleBtn" disabled>
+                                <span class="material-icons me-2">science</span>
+                                Сформировать выборку
                             </button>
-                            <button class="btn btn-success flex-grow-1" id="exportExcelBtn" disabled>
-                                <span class="material-icons me-2">table_chart</span>
-                                Excel
-                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Экспорт данных -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <span class="material-icons me-2">download</span>
+                            <h5 class="mb-0">Экспорт данных</h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Область для выбора типа экспорта -->
+                            <div class="export-options mb-3">
+                                <label class="form-label">Тип экспорта:</label>
+                                <div class="d-flex mb-3 export-type-selector">
+                                    <div class="form-check me-4">
+                                        <input class="form-check-input" type="radio" name="exportType" id="exportSample"
+                                            value="sample" checked>
+                                        <label class="form-check-label" for="exportSample">
+                                            Только выборка
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="exportType" id="exportAll"
+                                            value="all">
+                                        <label class="form-check-label" for="exportAll">
+                                            Полная популяция с метками
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Кнопки для экспорта -->
+                            <div class="d-flex gap-3" id="exportButtons">
+                                <button class="btn btn-success flex-grow-1" id="exportCsvBtn" disabled>
+                                    <span class="material-icons me-2">insert_drive_file</span>
+                                    CSV
+                                </button>
+                                <button class="btn btn-success flex-grow-1" id="exportExcelBtn" disabled>
+                                    <span class="material-icons me-2">table_chart</span>
+                                    Excel
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Правая колонка: Результаты -->
-            <div class="col-lg-8">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <div class="d-flex justify-content-between align-items-center w-100">
-                            <div class="d-flex align-items-center">
-                                <span class="material-icons me-2">analytics</span>
-                                <h5 class="mb-0">Результаты</h5>
+            <div class="tab-pane fade" id="results" role="tabpanel">
+                <div class="col-lg-12">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center w-100">
+                                <div class="d-flex align-items-center">
+                                    <span class="material-icons me-2">analytics</span>
+                                    <h5 class="mb-0">Результаты</h5>
+                                </div>
+                                <div class="sample-stats" id="sampleStats"></div>
                             </div>
-                            <div class="sample-stats" id="sampleStats"></div>
+                        </div>
+                        <div class="card-body">
+                            <div id="sampleResults">
+                                <div class="alert alert-info">
+                                    Загрузите данные и сформируйте выборку, чтобы увидеть результаты.
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div id="sampleResults">
+                </div>
+            </div>
+
+            <!-- Вкладка с подробностями (бывшие предобработанные данные) -->
+            <div class="tab-pane fade" id="details" role="tabpanel">
+                <div class="row">
+                    <div class="col">
+                        <!-- Блок для отображения статистических данных -->
+                        <div id="preprocessedStats" class="mb-4">
+                            <!-- Здесь будут отображаться статистические данные о ML-модели -->
+                        </div>
+
+                        <!-- Блок для отображения предобработанных данных -->
+                        <div id="preprocessedResults">
                             <div class="alert alert-info">
-                                Загрузите данные и сформируйте выборку, чтобы увидеть результаты.
+                                <div class="d-flex align-items-center">
+                                    <span class="material-icons me-2">info</span>
+                                    <span>Загрузите данные и сформируйте выборку, чтобы увидеть детализированные
+                                        данные.</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -275,14 +450,17 @@
     <!-- Контейнер для уведомлений -->
     <div id="alertContainer" class="position-fixed bottom-0 end-0 p-3" style="z-index: 11"></div>
 
-    <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="js/export-functions.js"></script>
-    <script src="statistical_sampling/random.js"></script>
-    <script src="statistical_sampling/systematic.js"></script>
-    <script src="statistical_sampling/stratified.js"></script>
-    <script src="statistical_sampling/mus.js"></script>
-    <script src="js/data-manager.js"></script>
-    <script src="js/popup.js"></script>
+    <script src="js/libs/bootstrap.bundle.min.js"></script>
+    <script src="js/core/export-functions.js"></script>
+    <script src="js/statistical_sampling/random.js"></script>
+    <script src="js/statistical_sampling/systematic.js"></script>
+    <script src="js/statistical_sampling/stratified.js"></script>
+    <script src="js/statistical_sampling/mus.js"></script>
+    <script src="js/ml_sampling/isolation_forest.js"></script>
+    <script src="js/core/data-manager.js"></script>
+    <script src="js/core/popup.js"></script>
+    <!-- Скрипт исправления отображения таблицы -->
+    <script src="js/utils/fix-table.js"></script>
 </body>
 
 </html>

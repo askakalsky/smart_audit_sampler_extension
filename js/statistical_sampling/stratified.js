@@ -462,19 +462,3 @@ function createStratifiedSampleProportional(population, sampleSize, strataColumn
         throw error;
     }
 }
-
-// Пример использования:
-/*
-const data = [
-  { id: 1, group: 'A', value: 10 },
-  { id: 2, group: 'A', value: 20 },
-  { id: 3, group: 'B', value: 30 },
-  { id: 4, group: 'B', value: 40 },
-  { id: 5, group: 'C', value: 50 },
-  { id: 6, group: 'C', value: 60 }
-];
-
-const result = stratifiedSampling(data, 3, 'group', 42);
-console.log(result.methodDescription);
-console.log('Sample:', result.sample);
-*/

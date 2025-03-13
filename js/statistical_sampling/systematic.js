@@ -146,23 +146,3 @@ if (typeof window !== 'undefined') {
     }
   };
 }
-
-// Пример использования:
-/*
-const data = [
-  { id: 1, name: 'A', value: 10 },
-  { id: 2, name: 'B', value: 20 },
-  { id: 3, name: 'C', value: 30 },
-  { id: 4, name: 'D', value: 40 },
-  { id: 5, name: 'E', value: 50 },
-  { id: 6, name: 'F', value: 60 },
-  { id: 7, name: 'G', value: 70 },
-  { id: 8, name: 'H', value: 80 },
-  { id: 9, name: 'I', value: 90 },
-  { id: 10, name: 'J', value: 100 }
-];
-
-const result = systematicSampling(data, 3, 42);
-console.log(result.methodDescription);
-console.log('Sample:', result.sample);
-*/
